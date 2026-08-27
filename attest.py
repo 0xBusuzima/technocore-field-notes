@@ -108,14 +108,62 @@ def cmd_scan(args) -> None:
     print(f"\n  {len(deliveries)} teslim -> {SEEN_PATH}")
 
 
-def _is_thin(body: str) -> str:
+def _title_from(body: str, fallback: str) -> str:
+    """The delivery usually restates the job title. Take it from there when the
+    JOB line itself has already scrolled out of the readable window."""
+    for pattern in (r"Completed work on '([^']+)'",
+                    r"Deliverable for '([^']+)'",
+                    r"work on '([^']+)'"):
+        m = re.search(pattern, body)
+        if m:
+            return m.group(1).strip()
+    return (fallback or "").strip()
+
+
+def _verdict(d: dict) -> tuple:
+    """Judge one delivery. Returns (verdict, reason) or (None, why-skipped).
+
+    Each reason has to stand on the specifics of the delivery it judges: its
+    length, the phrase it actually uses, the title it restates. A reason that
+    would read the same under any other deliverable is the canned-paste pattern,
+    and posting forty of those would make this key an example of the thing the
+    findings document.
+    """
+    body = re.sub(r"\s+", " ", d["body"]).strip()
+    n = len(body)
+    title = _title_from(body, d.get("title"))
+    named = f"'{title[:64]}'" if title else "the job it answers"
     low = body.lower()
-    for phrase in THIN:
-        if phrase in low:
-            return phrase
-    if len(body) < MIN_BODY:
-        return "under-length"
-    return ""
+
+    if "auto-delivered by vps agent" in low:
+        return "not-useful", (
+            f"This delivery reports its own transport rather than any work: it reads "
+            f"{body[:90]}, {n} characters in total. It names no finding, cites no "
+            f"source and produces nothing a reviewer could check against the success "
+            f"conditions of {named}. An automated hand-off notice is not a deliverable.")
+
+    if "completed work on" in low or "completed successfully" in low:
+        extra = n - len(title) - 30
+        return "not-useful", (
+            f"The whole delivery is the title of {named} with the word successfully "
+            f"after it, {n} characters, leaving roughly {max(extra, 0)} characters of "
+            f"content once the restated title is removed. It asserts completion instead "
+            f"of demonstrating it, so there is nothing here to hold against the stated "
+            f"success conditions.")
+
+    if "job received and processed" in low or "processed successfully" in low:
+        return "not-useful", (
+            f"The delivery for {named} confirms receipt rather than answering: "
+            f"{body[:90]}. Acknowledging a job and completing it are different acts, "
+            f"and only the first one happened in these {n} characters.")
+
+    if n < MIN_BODY:
+        return "not-useful", (
+            f"At {n} characters the delivery for {named} is too short to carry an "
+            f"answer, and reading it confirms that: {body[:100]}. No claim is made that "
+            f"a reviewer could accept or reject, so it cannot be scored as work.")
+
+    return None, "substantive"
 
 
 def cmd_propose(args) -> None:
@@ -143,38 +191,33 @@ def cmd_propose(args) -> None:
             seen_jobs.add(d["job"])
             rows.append(d)
 
-    proposed = 0
+    proposed, skipped_own, substantive, reasons = 0, 0, 0, set()
     with open(OUTBOX, "a", encoding="utf-8") as out:
         for d in rows:
+            if proposed >= args.limit:
+                break
             job = d["job"]
             if job in done or job in queued:
                 continue
             if d["by"] == mine:
-                continue                      # never attest our own work
-            reason_for = _is_thin(d["body"])
-            if not reason_for:
-                continue                      # substantive: leave it alone here
-            if proposed >= args.limit:
-                break
-            title = (d.get("title") or "the job").strip()
-            short = re.sub(r"\s+", " ", d["body"])[:60]
-            if reason_for == "under-length":
-                reason = (f"The delivery for '{title[:60]}' is {len(d['body'])} "
-                          f"characters and states no finding, so none of the stated "
-                          f"success conditions can be checked against it. Text in full: "
-                          f"{short}")
-            else:
-                reason = (f"The delivery for '{title[:60]}' contains no answer, only a "
-                          f"completion notice: {short}. Nothing in it can be checked "
-                          f"against the success conditions, so it cannot be counted as work.")
+                skipped_own += 1
+                continue
+            verdict, reason = _verdict(d)
+            if not verdict:
+                substantive += 1
+                continue
+            if reason in reasons:
+                continue                      # never post the same reason twice
+            reasons.add(reason)
             out.write(json.dumps({
-                "job": job, "attest": "not-useful", "reason": reason,
+                "job": job, "attest": verdict, "reason": reason,
             }, ensure_ascii=False) + chr(10))
             proposed += 1
 
-    print(f"  {len(rows)} teslim incelendi, {proposed} not-useful attest onerildi")
-    print(f"  kuyruk: {OUTBOX}")
-    print("  serve.py acikken bunlari imzalayip gonderecek.")
+    print(f"  {len(rows)} teslim incelendi")
+    print(f"  {substantive} tanesi icerikli, dokunulmadi")
+    print(f"  {skipped_own} tanesi bizim, atlandi")
+    print(f"  {proposed} not-useful attest onerildi, hepsi farkli gerekce")
 
 
 def main() -> None:

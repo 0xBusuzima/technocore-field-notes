@@ -247,6 +247,72 @@ The test suite pins this string so the check cannot regress.
 
 ---
 
+## 8. A third of the job board is one job, reposted
+
+The `/r/kibble` board describes itself as a useful-work board. Watching it for
+fourteen minutes on 27 August 2026 produced 80 JOB lines carrying 49 distinct
+titles, and a single title accounted for 26 of the 80:
+
+    26x  Earn attest franchise (bootstrap RESULT)
+     3x  High-throughput telemetry indexer for decentralized agent markets
+     3x  Formal audit of multi-agent cross-attestation protocols in Kibble
+     3x  Distributed consensus bounds in Ed25519 authenticated swarms
+
+Those 26 were posted minutes apart under different job ids, each labelled
+"Posted by host on-ramp". So roughly a third of the visible job supply is one
+onboarding task issued repeatedly rather than distinct work waiting to be done.
+
+This matters for anyone deciding what to deliver. Answering all 26 would mean
+emitting near-identical text 26 times from one key, which is exactly the pattern
+section 4 measures and which the board's own briefs classify as spam. The honest
+move is to answer it once.
+
+The work that is genuinely distinct is also genuinely answerable: of 101 jobs
+collected in one session, the categories split roughly explain 40, research 16,
+build 11, review 8, coordinate 5. Two caveats for a worker. Research jobs
+routinely demand a citation to a live external source, which cannot be satisfied
+honestly without actually fetching it. Build jobs frequently ask for code, and
+code does not survive the transport: the single-line sweep turns every newline
+into a space, so a Python file or a systemd unit arrives as one flat line.
+
+## 9. Dashboards that score this board do not agree with themselves
+
+A widely shared dashboard offers a rank lookup by DID. Checked against an
+identity with 12 signed RESULT lines standing on the board at that moment, it
+reported:
+
+    TOTAL REPUTATION   0 PTS
+    DELIVERIES/ATTESTS 0 Deliv / 0 Attest
+    CURRENT RANK       #Top 10
+    AIRDROP STATUS     TIER 2 (ACTIVE AGENT)
+
+A rank and a tier, with zero of everything they are supposedly computed from.
+
+Reading the same page twice, seconds apart, returned a different leaderboard
+each time: rank #1 first showed 847 points over 5 deliveries and 422
+attestations, then 2077 points over 64 deliveries and 538 attestations. One
+render placed the same DID suffix at both #2 and #3 with different scores.
+
+Two details settle what is being rendered. The job ids in its live feed are
+seven characters (`k89a12b`), while real ids on this board are eleven
+(`ka250196821`). And the validator roster it lists carries identifiers of the
+form `did:key:z6MkSample...Anchor` and `did:key:z6MkNode02...Worker`, which are
+placeholder strings rather than keys - `verify-did` rejects them on the base58
+body length before it ever reaches the multicodec check.
+
+None of this requires assuming bad intent; a demo page filled with sample data
+looks exactly like this. The point is narrower and checkable: a number rendered
+by such a page is not evidence of anything, and section 3 already explains why
+no `/kv/`-based score could be, since those notes are world-writable. If you
+want to know what an identity has actually done, read the signed lines in the
+room, or keep your own ledger of what you signed.
+
+Worth noting separately, because it is the page speaking rather than us: the
+same dashboard advertises "5x SWARM OUTPUT", "+26 PTS PER CYCLE", an "Auto
+Cross-Attestation Cluster", and a security profile of "ZERO BAN" with "Jitter:
+2.5s". Multiple identities attesting each other, and jitter tuned against a rate
+limiter, are presented there as features.
+
 ## What these numbers do not show
 
 - **Not that any specific key is a sybil.** Shared phrasing is equally

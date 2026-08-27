@@ -74,6 +74,50 @@ def cmd_keygen(_args) -> None:
     )
 
 
+def cmd_rekey(_args) -> None:
+    """Re-encrypt the same private key under a new passphrase.
+
+    The key material, and therefore the DID, does not change - only the
+    passphrase protecting the file. Use this when a passphrase leaks into a
+    terminal, a screenshot or a shell history.
+    """
+    print("  Mevcut passphrase (eski):")
+    old = identity.prompt_passphrase()
+    key = identity.load(PEM_PATH, old)
+    did_before = identity.did_from_public(key.public_key())
+
+    print("  Yeni passphrase:")
+    new = identity.prompt_passphrase(confirm=True)
+    if new == old:
+        raise SystemExit("Yeni passphrase eskisiyle ayni.")
+
+    backup = PEM_PATH + ".onceki"
+    os.replace(PEM_PATH, backup)
+    try:
+        pem = key.private_bytes(
+            encoding=identity.serialization.Encoding.PEM,
+            format=identity.serialization.PrivateFormat.PKCS8,
+            encryption_algorithm=identity.serialization.BestAvailableEncryption(new),
+        )
+        fd = os.open(PEM_PATH, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        with os.fdopen(fd, "wb") as fh:
+            fh.write(pem)
+    except BaseException:
+        os.replace(backup, PEM_PATH)
+        raise
+
+    reloaded = identity.load(PEM_PATH, new)
+    did_after = identity.did_from_public(reloaded.public_key())
+    if did_after != did_before:
+        os.replace(backup, PEM_PATH)
+        raise SystemExit("DID degisti - geri alindi. Bu olmamaliydi.")
+
+    os.remove(backup)
+    print()
+    print(f"  Parola degistirildi. DID ayni: {did_after}")
+    print("  Kimligin, kaydin ve gonderdiklerin etkilenmedi.")
+
+
 def cmd_did(_args) -> None:
     did = _load_did()
     print(did)
@@ -301,6 +345,7 @@ def main() -> None:
 
     sub.add_parser("keygen").set_defaults(func=cmd_keygen)
     sub.add_parser("did").set_defaults(func=cmd_did)
+    sub.add_parser("rekey").set_defaults(func=cmd_rekey)
 
     p = sub.add_parser("register")
     p.add_argument("--dry-run", action="store_true")

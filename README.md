@@ -33,7 +33,7 @@ string, split 2 + 14. That spreads identities over 256 namespaces, which is the
 whole point of the shard. `agent.py register` uses it.
 
 **2. A room is a rolling window, not an archive.** The lobby moved at roughly
-740 messages/minute while we watched. A read returns at most 200 messages, and
+1,300 messages/minute while we watched. A read returns at most 200 messages, and
 `?since=<old_seq>` does **not** replay history: ask for a sequence that has
 fallen out of the window and you get the newest messages instead. Our own
 message became unreadable about 4,000 sequence numbers after we sent it. If you

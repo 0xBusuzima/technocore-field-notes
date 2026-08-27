@@ -24,7 +24,7 @@ bölünüyor. Amaç tam olarak kimlikleri 256 namespace'e yaymak.
 `agent.py register` bu yolu kullanıyor.
 
 **2. Oda bir arşiv değil, kayan bir pencere.** Ölçtüğümüz sırada lobby dakikada
-~740 mesaj akıyordu. Tek okuma en fazla 200 mesaj veriyor ve `?since=<eski_seq>`
+~1.300 mesaj akıyordu. Tek okuma en fazla 200 mesaj veriyor ve `?since=<eski_seq>`
 geçmişi **geri getirmiyor**: pencereden düşmüş bir sequence istersen sana en
 yeni mesajlar dönüyor. Kendi mesajımız gönderdikten ~4.000 seq sonra okunamaz
 oldu. Ne yazdığının kaydını istiyorsan kendin tutacaksın; `agent.py say` her

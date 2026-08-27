@@ -71,7 +71,7 @@ must keep it yourself.** `agent.py say` appends every send: room, sequence,
 nonce, signature, text: to a local `sent.jsonl` for this reason.
 
 The only way to sample such a room without gaps is to long-poll with
-`?since=<last_seq>&wait=10` and stitch the responses. Our 12-minute sample came
+`?since=<last_seq>&wait=10` and stitch the responses. Our sample came
 back perfectly contiguous: 10,263 messages spanning sequence 4610870 to 4621132,
 a span of 10,262: zero skipped sequences.
 
@@ -123,7 +123,10 @@ one lane into another. There is a test for that.
 
 ## 4. What the lobby is actually made of
 
-Sample: `/r/lobby`, 12 minutes, 10,263 contiguous messages, 27 August 2026.
+Sample: `/r/lobby`, 10,263 contiguous messages spanning 7 minutes 52 seconds,
+27 August 2026. Contiguous is measured, not assumed: the sequence span equals
+the message count exactly, and the longest gap between consecutive timestamps is
+4.5 seconds.
 
 ```bash
 python survey.py collect lobby --minutes 12 --out data/lobby-2026-08-27.jsonl
@@ -133,7 +136,7 @@ python survey.py analyse data/lobby-2026-08-27.jsonl
 | measure | value |
 |---|---|
 | messages | 10,263 |
-| rate | ~855 / minute |
+| rate | ~1,300 / minute |
 | distinct keys | 8,333 |
 | signed with a `did:key` | **99.9%** |
 | authors who posted exactly once | **90%** |
@@ -141,15 +144,15 @@ python survey.py analyse data/lobby-2026-08-27.jsonl
 | same template after normalising | **64.7%** |
 | generic check-in phrasing | 29.9% |
 | mentions airdrop / points / rank | 15.9% |
-| mentions any other DID | **4.5%** |
+| mentions any other DID | **4.4%** |
 | top 10 authors' share of traffic | 5.6% |
 
 Two of those rows matter more than the rest.
 
-**Almost nobody is talking to anybody.** 4.5% of messages contain another
+**Almost nobody is talking to anybody.** 4.4% of messages contain another
 agent's DID. The server publishes its own version of this on `/rooms`:
-`zero-response 8%, nick diversity 0.32, notes/msg 67.01`. A room at 855
-messages a minute where 95% of messages address no one is not a conversation;
+`zero-response 8%, nick diversity 0.32, notes/msg 67.01`. A room at 1,300
+messages a minute where 96% of messages address no one is not a conversation;
 it is 8,000 monologues in a shared buffer.
 
 **The duplication is spread across keys, not concentrated in a few.** This is
@@ -163,7 +166,7 @@ how the room reads:
 | distinct keys emitting the single widest template | **187** |
 
 The five widest, with the number of *distinct Ed25519 keys* that emitted each,
-byte-for-byte, inside the same twelve minutes:
+byte-for-byte, inside the same eight minutes:
 
 ```
 187 keys  just dropping my daily ping. let's see how the q0 snapshot plays out.
@@ -179,7 +182,7 @@ posting once, drawing from a few thousand shared sentences.
 
 A signature proves possession of a key. It does not prove that the key is
 operated independently of the other 186 keys that emitted the same sentence in
-the same twelve minutes. That distinction is the entire security model of this
+the same eight minutes. That distinction is the entire security model of this
 service, stated plainly in its own documentation:
 
 > proves possession of a key and nothing else: not who you are, not that you are
@@ -208,7 +211,7 @@ max_wait              10   ceiling that ?wait= is clamped to
 ```
 
 The duplicate filter explains the shape of the repetition above: five copies of
-a sentence per 60 seconds is refused, but 187 keys spread over twelve minutes
+a sentence per 60 seconds is refused, but 187 keys spread over eight minutes
 never touch that limit.
 
 ## 6. Two things that will bite a client author
@@ -324,7 +327,7 @@ limiter, are presented there as features.
   stated agent-side criterion, from `flop.finance/teaser/`, is what an agent
   spends on inference during the testnet: a thing that cannot be accumulated
   before the faucet exists.
-- **Not a general truth about the service.** One room, twelve minutes, one
+- **Not a general truth about the service.** One room, eight minutes, one
   vantage point, one IP. Run the tools yourself; the point of publishing them is
   that you do not have to take our word for any of this.
 

@@ -90,7 +90,9 @@ def cmd_collect(args) -> None:
 
     elapsed = time.time() - started
     print(f"\n  {written} mesaj -> {args.out}")
-    print(f"  sure {elapsed:.0f}s, atlanan {gaps}, hiz {written / (elapsed / 60):.0f}/dk")
+    print(f"  wall clock {elapsed:.0f}s, atlanan {gaps}")
+    # Wall clock is not the span the sample covers: the last polls can come
+    # back empty. analyse derives the real span from the timestamps.
 
 
 def cmd_analyse(args) -> None:
@@ -121,6 +123,15 @@ def cmd_analyse(args) -> None:
     print(f"\n=== {args.path} ===")
     print(f"  mesaj                 {total}")
     print(f"  seq araligi           {rows[0].get('seq')}..{rows[-1].get('seq')}")
+    try:
+        import datetime as _dt
+        t0 = _dt.datetime.fromisoformat(rows[0]["ts"].replace("Z", "+00:00"))
+        t1 = _dt.datetime.fromisoformat(rows[-1]["ts"].replace("Z", "+00:00"))
+        span = (t1 - t0).total_seconds()
+        print(f"  kapsanan sure         {span:.0f}s ({span/60:.2f} dk)")
+        print(f"  hiz                   {total/(span/60):.0f} mesaj/dk")
+    except (KeyError, ValueError):
+        pass
     print(f"  farkli yazar          {len(by_author)}")
     print(f"  imzali (did:key)      {pct(len(signed))}  ({len(signed)})")
     print(f"  imzasiz (nick)        {pct(total - len(signed))}")

@@ -10,3 +10,8 @@ did.txt
 
 __pycache__/
 *.pyc
+
+# serve loop state
+inbox.jsonl
+outbox.jsonl
+outbox.done

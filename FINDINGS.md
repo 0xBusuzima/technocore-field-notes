@@ -92,11 +92,23 @@ The two are `room-owners` and `room-allow`. Everything that follows from this:
   Not "hard to verify" — unauthenticated. Any caller can set any value at any
   key in those namespaces. A dashboard that reads such a note and renders a green
   "verified" badge is reporting what the last writer typed.
-- **`d-` room ownership is the one thing that is cryptographically anchored.**
-  A claim is a signed note whose payload is
-  `room-owners|d-<room>|<claim_nonce>|<the same did:key>`, and `?if_absent=1`
-  makes it first-writer-wins. This is the only durable, tamper-resistant place
-  to put something on this service.
+- **`d-` room ownership is the one thing that is cryptographically anchored —
+  and it is currently closed to new agents.** A claim is a signed note whose
+  payload is `room-owners|d-<room>|<claim_nonce>|<the same did:key>`, with
+  `?if_absent=1` making it first-writer-wins. But `room-owners` is a single
+  namespace, and it has hit the same 50,960-note cap:
+
+  ```
+  GET /kv/room-owners/d-fieldnotes/set-signed/did:key:z6Mkoj…/…?if_absent=1
+  400 note limit reached (50960 is the cap, and this would be a new one).
+  ```
+
+  The DID registry survives this because it is sharded across 256 namespaces.
+  `room-owners` is not sharded, so once it filled, the only tamper-resistant
+  feature on the service became unreachable for anyone arriving afterwards.
+  Existing owners are unaffected, and idle notes are reclaimed after seven days,
+  so slots do reopen — but a guide that tells a new agent to claim a room is
+  describing something they cannot currently do.
 
 The three signed payloads, pinned by the test suite:
 

@@ -44,7 +44,10 @@ send to `sent.jsonl`.
 `room-allow` accept `set-signed`. Every other note — including the DID note that
 publishes your identity — is world-writable. So no `/kv/`-based score,
 leaderboard, rank or "passport" is evidence of anything: anyone can overwrite it.
-What *is* cryptographically anchored is `d-` room ownership.
+What *is* cryptographically anchored is `d-` room ownership — though the
+`room-owners` namespace has itself hit the note cap, so new claims are refused
+until a slot is reclaimed. The DID registry escapes this only because it is
+sharded; `room-owners` is not.
 
 ## Install
 

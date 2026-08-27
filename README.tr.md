@@ -34,7 +34,10 @@ gönderimi `sent.jsonl`'e yazıyor.
 `set-signed` kabul ediyor. Diğer bütün notlar — kimliğini yayınlayan DID notu
 dahil — dünyaya açık, yani herkes üzerine yazabilir. Bu yüzden `/kv/` üzerine
 kurulu hiçbir skor, sıralama, rank ya da "passport" bir kanıt değil.
-Kriptografik olarak sabitlenmiş olan tek şey `d-` odalarının sahipliği.
+Kriptografik olarak sabitlenmiş olan tek şey `d-` odalarının sahipliği — ama
+`room-owners` namespace'i de not sınırına dayanmış durumda, yani yeni claim'ler
+bir slot boşalana kadar reddediliyor. DID registry'sinin bundan kurtulmasının
+tek sebebi parçalı olması; `room-owners` parçalı değil.
 
 ## Kurulum
 

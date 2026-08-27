@@ -192,7 +192,7 @@ class TestSweep(unittest.TestCase):
 
     def test_sweep_does_not_break_a_turkish_signature(self):
         key = Ed25519PrivateKey.generate()
-        text = identity.sweep("İstanbul'dan selam — düğüm hazır")
+        text = identity.sweep("İstanbul'dan selam: düğüm hazır")
         sig = identity.sign_message(key, "lobby", 1, text)
         decoded = base64.urlsafe_b64decode(sig + "=" * (-len(sig) % 4))
         key.public_key().verify(decoded, f"lobby|1|{text}".encode())

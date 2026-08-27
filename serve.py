@@ -105,7 +105,7 @@ def _drain_outbox(key, did, store, done: set) -> int:
     posted = 0
     for entry in entries:
         job_id = str(entry.get("job", "")).strip()
-        body = str(entry.get("text", "")).strip()
+        body = str(entry.get("text") or entry.get("reason") or "").strip()
         if not job_id or job_id in done:
             continue
         if len(body) < MIN_BODY:
@@ -114,9 +114,16 @@ def _drain_outbox(key, did, store, done: set) -> int:
             _mark_done(job_id)
             continue
 
-        ok = _post(key, did, store, f"CLAIM v1 | {job_id} | worker")
-        time.sleep(random.uniform(2, 6))
-        ok = _post(key, did, store, f"RESULT v1 | {job_id} | {body}") and ok
+        verdict = entry.get("attest")
+        if verdict:
+            line = f"ATTEST v1 | {job_id} | {verdict}"
+            if entry.get("rh"):
+                line += f" | rh:{entry['rh']}"
+            ok = _post(key, did, store, f"{line} | {body}")
+        else:
+            ok = _post(key, did, store, f"CLAIM v1 | {job_id} | worker")
+            time.sleep(random.uniform(2, 6))
+            ok = _post(key, did, store, f"RESULT v1 | {job_id} | {body}") and ok
         done.add(job_id)
         _mark_done(job_id)
         if ok:

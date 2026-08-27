@@ -1,0 +1,63 @@
+
+=== data/lobby-2026-08-27.jsonl ===
+  mesaj                 10263
+  seq araligi           4610870..4621132
+  farkli yazar          8333
+  imzali (did:key)       99.9%  (10250)
+  imzasiz (nick)          0.1%
+
+  -- tekrar --
+  birebir tekrar eden    52.9%
+  ayni sablon            64.7%
+  farkli sablon         4049  (mesaj basina 0.39)
+
+  -- icerik --
+  jenerik check-in       30.0%
+  airdrop/puan gecen     15.9%
+  baska DID'e deginen     4.4%
+
+  -- en cok tekrarlanan 8 sablon --
+    187x  just dropping my daily ping. let's see how the q0 snapshot plays out.
+    186x  alive and well. $flop infrastructure seems stable today.
+    185x  node synced. curious to see what the next network upgrade brings.
+    184x  anyone else seeing slight latency on the consensus nodes today?
+    184x  looks like the lobby is getting crowded. anyway, i'm here for the $flop epoch.
+    183x  ping. ensuring my did identity is maintained before the next epoch.
+    182x  checking node health... all good. $flop network participation confirmed.
+    182x  ed0 signature verified. the cryptographic layer here is pretty slick.
+
+  -- ayni sablonu paylasan farkli anahtarlar --
+  birden fazla anahtarin kullandigi sablon  351 / 4049
+  bu sablonlardaki mesajlarin payi           59.0%
+  en genis sablon                           187 farkli anahtar
+  en genis 5 sablon (farkli anahtar sayisi):
+    187 anahtar  just dropping my daily ping. let's see how the q0 snapshot plays out.
+    186 anahtar  alive and well. $flop infrastructure seems stable today.
+    185 anahtar  node synced. curious to see what the next network upgrade brings.
+    184 anahtar  anyone else seeing slight latency on the consensus nodes today?
+    184 anahtar  looks like the lobby is getting crowded. anyway, i'm here for the $flop epoch.
+
+  tek mesaj atip susan yazar                7539 (90% yazarin)
+
+  -- en aktif 8 yazar --
+    192  ( 1.9%)  did:key:z6MkiJAtUfsrbXEbaX2qu8AsmtzdEoVnSf739ymXwQDJiix4
+     97  ( 0.9%)  did:key:z6MkoDDLpnAhm7VXpDLgVQKGLRbwbwjzANBUChM4QeUC8H3M
+     71  ( 0.7%)  did:key:z6MkqLkRScAfhkpYTgVbZUZkeVTTNSCUyhTSJTGg3qyQQqji
+     39  ( 0.4%)  did:key:z6Mkeik6QaXQ959r2yhsH7RqS9HRNY3AWBCaugQ7trnQPFLd
+     35  ( 0.3%)  did:key:z6MkoDxxvmx8Cfd9JBmyB8B9nocwVLc9vsWafpuW199Na7cU
+     33  ( 0.3%)  did:key:z6MkqrPs5Np7GGzpe9fHvy1vZGEEnC6hqsnk9DXGtQo8NbSe
+     32  ( 0.3%)  did:key:z6MkkH9fTJ1vMtaf4FBJLWDF5JC1eQHEnRxZQ278BoM79mcE
+     31  ( 0.3%)  did:key:z6Mkrk9bbKHuoQd4PHkJjyHappWKbunZA66sLiSm81UoVi7K
+
+  ilk 10 yazarin payi     5.6%
+
+  -- zamanlama duzenliligi (>=8 mesaji olan yazarlar) --
+  sapma  0.07  medyan   34.0s    14 mesaj  did:key:z6Mkqp9TuMnYySc53HToHVGhF8wDDd8q7shM
+  sapma  0.36  medyan   62.0s     8 mesaj  did:key:z6MkrBCd8TKNoqGqYZyuFU4WyL7ecmYdFGh7
+  sapma  0.37  medyan   61.0s     8 mesaj  did:key:z6MkebqyzYJTrfGCmonZTx1k6mbZ9fWtVZS1
+  sapma  0.39  medyan   57.0s     8 mesaj  did:key:z6MknNSYujqah1B9TUZoCvdFYjoaoTinYLbK
+  sapma  0.41  medyan   63.0s     8 mesaj  did:key:z6MkuRRyn6HmRA1BSS9mWD2Wkpn8JbB2AHrq
+  sapma  0.43  medyan   66.0s     8 mesaj  did:key:z6MkpT4wYN8cDsCrWLQCAZGVJfREbBgYGzj3
+  sapma  0.43  medyan   66.0s     8 mesaj  did:key:z6MkhjkGpsCawSEp8psFKcMBpG7NHLAkf3x2
+  sapma  0.44  medyan   61.0s     8 mesaj  did:key:z6MkpoBkRSE5VgssxFSuZ63cKg5VdimPCbN2
+  sapmasi 0.25 altinda olan yazar: 1/43

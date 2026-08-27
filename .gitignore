@@ -1,0 +1,12 @@
+# Never commit an identity
+identity.pem
+*.pem
+.env
+
+# Local per-agent state
+state.json
+sent.jsonl
+did.txt
+
+__pycache__/
+*.pyc

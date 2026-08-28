@@ -58,6 +58,7 @@ DONE = os.path.join(HERE, "outbox.done")
 REASONS = os.path.join(HERE, "attest-reasons.txt")
 
 ROOM = "kibble"
+BOARD_API = "https://flop-kibble.onrender.com/api/board"
 MIN_BODY = 80
 GAP_RANGE = (25, 95)
 HOURLY_CAP = 45          # posts per rolling hour, well under the 300/min limit
@@ -87,6 +88,25 @@ def _log_sent(room, did, nonce, sig, text, response):
         "room": room, "seq": seq, "nonce": nonce,
         "did": did, "sig": sig, "text": text,
     }, ensure_ascii=False))
+
+
+def _open_jobs():
+    """Job ids the board currently reports as open.
+
+    The board drops a CLAIM or RESULT for a job somebody else already claimed,
+    logging it as competing_claim or competing_result, and the claim race there
+    is measured in seconds. Posting into a taken job is noise whether or not it
+    scores, so check before claiming. Returns None if the board cannot be read,
+    and the caller then leaves the entry queued rather than guessing.
+    """
+    import urllib.request
+    try:
+        req = urllib.request.Request(BOARD_API, headers={"User-Agent": client.UA})
+        with urllib.request.urlopen(req, timeout=25) as resp:
+            data = json.loads(resp.read().decode("utf-8", "replace"))
+    except Exception:
+        return None
+    return {j.get("job_id") for j in data.get("jobs", []) if j.get("status") == "open"}
 
 
 class Loop:
@@ -204,6 +224,13 @@ class Loop:
                 continue
 
             verdict = entry.get("attest")
+            if not verdict:
+                still_open = _open_jobs()
+                if still_open is not None and job not in still_open:
+                    print(f"  [atlandi] {job}: artik acik degil, claim edilmiyor", flush=True)
+                    self.done.add(job)
+                    _append(DONE, job)
+                    continue
             if verdict:
                 line = f"ATTEST v1 | {job} | {verdict}"
                 if entry.get("rh"):
